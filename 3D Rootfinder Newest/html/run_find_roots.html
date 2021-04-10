@@ -1,0 +1,2640 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>run_find_roots</title><meta name="generator" content="MATLAB 9.9"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2021-03-29"><meta name="DC.source" content="run_find_roots.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="comment">% % "Bad" example</span>
+<span class="comment">% u = 1;</span>
+<span class="comment">% n=5;</span>
+<span class="comment">% q1 = @(x,y,z) x.^n + u * (x+y+z)*sqrt(1/3) + z.^n + y.^n;</span>
+<span class="comment">% q2 = @(x,y,z) y.^n + u * (x*sqrt(2/3) - y*sqrt(1/6) - z*sqrt(1/6)) + z.^n + x.^n;</span>
+<span class="comment">% q3 = @(x,y,z) z.^n + u * (y - z)*sqrt(1/2);</span>
+<span class="comment">% % n = n+1;</span>
+<span class="comment">%</span>
+<span class="comment">% x0 = 0.1;</span>
+<span class="comment">% y0 = 0.2;</span>
+<span class="comment">% z0 = 0.3;</span>
+<span class="comment">% f1 = @(x,y,z) q1(x-x0,y-y0,z-z0);</span>
+<span class="comment">% f2 = @(x,y,z) q2(x-x0,y-y0,z-z0);</span>
+<span class="comment">% f3 = @(x,y,z) q3(x-x0,y-y0,z-z0);</span>
+<span class="comment">%</span>
+<span class="comment">% % n = 5;</span>
+<span class="comment">% % f1 = @(x,y,z) (y-1/sqrt(2)).^n.*(1+z).^2 + x.^2 + y.^2 - 1;</span>
+<span class="comment">% % f2 = @(x,y,z) x-y + z.^5-0.5^5;</span>
+<span class="comment">% % f3 = @(x,y,z) z.^n - 0.5^n + x - 1/sqrt(2);</span>
+
+<span class="comment">% Normal example</span>
+<span class="comment">% n = 2;</span>
+<span class="comment">% q1 = @(x,y,z) ((x-0.5).^2 + (y-0.5).^2 + z.^2 - 0.5);</span>
+<span class="comment">% q2 = @(x,y,z) ((x+0.5).^2 + (y-0.5).^2 + z.^2 - 0.5);</span>
+<span class="comment">% q3 = @(x,y,z) (x.^2 + y.^2 + z.^2 - 0.5^2);</span>
+<span class="comment">%</span>
+<span class="comment">% x0 = 0.1; %The other root is more inaccurate, and changing to +0.1 makes it even more so. Why?</span>
+<span class="comment">% y0 = 0.0;</span>
+<span class="comment">% z0 = 0.0;</span>
+<span class="comment">% f1 = @(x,y,z) q1(x-x0,y-y0,z-z0);</span>
+<span class="comment">% f2 = @(x,y,z) q2(x-x0,y-y0,z-z0);</span>
+<span class="comment">% f3 = @(x,y,z) q3(x-x0,y-y0,z-z0);</span>
+<span class="comment">%</span>
+<span class="comment">% % roots - [x0, 0.25, -sqrt(3)/4; x0, 0.25, sqrt(3)/4]</span>
+
+<span class="comment">% Non-polynomial example</span>
+n=6;
+f1 = @(x,y,z) cos(2*pi*x).*cos(2*pi*y).*cos(2*pi*z);
+f2 = @(x,y,z) y; <span class="comment">%sin(2*pi*x).*sin(2*pi*y).*sin(2*pi*z);</span>
+f3 = @(x,y,z) x.^2 + y.^2 + z.^2 - 1;
+<span class="comment">% sqrt(15)/4, 0.25, 0.75, then sin(arccos(0.75))=sqrt(7)/4</span>
+<span class="comment">% vals = [sqrt(15)/4, 0.25, 0.75, sqrt(7)/4] % Each has plus and minus</span>
+exact = [0.25 0 sqrt(15)/4; 0.25 0 -sqrt(15)/4; -0.25 0 sqrt(15)/4; -0.25 0 -sqrt(15)/4; <span class="keyword">...</span>
+    0.75 0 sqrt(7)/4; 0.75 0 -sqrt(7)/4; -0.75 0 sqrt(7)/4; -0.75 0 -sqrt(7)/4; <span class="keyword">...</span>
+    sqrt(15)/4 0 0.25; sqrt(15)/4 0 -0.25; -sqrt(15)/4 0 0.25; -sqrt(15)/4 0 -0.25; <span class="keyword">...</span>
+    sqrt(7)/4 0 0.75; sqrt(7)/4 0 -0.75; -sqrt(7)/4 0 0.75; -sqrt(7)/4 0 -0.75];
+<span class="comment">% min(abs(roots(:,3) - vals(1))) % largest error of order of magnitude 1e-07 with</span>
+<span class="comment">% not interpolating (n=7) as well as with interpolating.</span>
+
+roots = find_roots(f1,f2,f3,n);
+
+<span class="comment">% syms x y z;</span>
+<span class="comment">% oldroots=roots;</span>
+<span class="comment">% J=matlabFunction([diff(f1,x) diff(f2,x) diff(f3,x);diff(f1,y) diff(f2,y) diff(f3,y);diff(f1,z) diff(f2,z) diff(f3,z)]);</span>
+<span class="comment">% for ns=1:size(roots,1)</span>
+<span class="comment">%     g=roots(ns,:);</span>
+<span class="comment">%         for steps=1:10</span>
+<span class="comment">%             g=g-[f1(g(1),g(2),g(3)) f2(g(1),g(2),g(3)) f3(g(1),g(2),g(3))]/J(g(1),g(2),g(3));</span>
+<span class="comment">%         end</span>
+<span class="comment">%     roots(ns,:)=g;</span>
+<span class="comment">% end</span>
+<span class="comment">% roots;</span>
+<span class="comment">% polishment=abs(oldroots-roots)</span>
+<span class="comment">%</span>
+<span class="comment">% treshold=1e-5;</span>
+<span class="comment">% sols = (abs(f1(roots(:,1),roots(:,2),roots(:,3))) &lt; treshold) &amp; (abs(f2(roots(:,1),roots(:,2),roots(:,3))) &lt; treshold) &amp; (abs(f3(roots(:,1),roots(:,2),roots(:,3))) &lt; treshold);</span>
+<span class="comment">% k = find(sols);</span>
+<span class="comment">% roots_final = roots(k,:);</span>
+
+<span class="keyword">for</span> i=1:size(exact,1)
+    min(vecnorm((roots - exact(i,:))'))
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">Evaluating the Cayley function:
+Elapsed time is 0.209747 seconds.
+Interpolating the Cayley function:
+Elapsed time is 0.281344 seconds.
+Solving the eigenproblem:
+Elapsed time is 15.953767 seconds.
+Elapsed time is 2.575617 seconds.
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.486657e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.538711e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.529536e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.596487e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.057484e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.928298e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.638654e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.066152e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.622599e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.657090e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.149475e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.534552e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.084342e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.273717e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.735397e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.077062e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.916461e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.971056e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.889301e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.014573e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.009817e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.056622e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.349324e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.395649e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.551348e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.976367e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.860608e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.368217e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.167982e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.766393e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.448268e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.259377e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.123262e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.785149e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.369074e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.711421e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.286365e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.657247e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.256323e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.231206e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.733024e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.488677e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.602829e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.851268e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.852028e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.050096e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.006296e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.822723e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.714047e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.304367e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.270843e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.161994e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.238217e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.686337e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.105612e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.175142e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.553831e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.337327e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.619556e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.129055e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.821417e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.296118e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.368738e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.209400e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.053316e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.041168e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.860297e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.775111e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.885552e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.387670e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.079990e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.355697e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.351636e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.315799e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.153334e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.014583e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.027182e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.579470e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.109163e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.643241e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.967879e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.897198e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.425843e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.375679e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.625831e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.411138e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.594942e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.066148e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.474104e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.651543e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.354372e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.460433e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.478991e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.331615e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.266035e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.233503e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.349796e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.237297e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.272169e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.798543e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.691165e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.349439e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.525461e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.533938e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.922006e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.078704e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.636067e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.275469e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.859805e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.421355e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.467316e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.678874e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.882168e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.606303e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.084156e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.558212e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.950371e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.374811e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.079519e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.280786e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.898497e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.258932e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.530140e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.744922e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.480496e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.789551e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.669034e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.974504e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.971863e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.832434e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.626878e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.692554e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.612736e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.344565e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.789920e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.226600e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.692554e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.612736e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.344565e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.789920e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.226600e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.692554e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.612736e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.344565e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.789920e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.226600e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.716685e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.834210e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.812424e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.509699e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.803877e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.644805e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.647968e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.152554e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.731522e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.103746e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.827799e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.074074e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.498222e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.964784e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.975126e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.447467e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.118993e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.064194e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.596292e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.680836e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.008432e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.108797e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.998287e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.744004e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.347712e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.329978e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.237535e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.151290e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.164189e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.674344e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.070329e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.656740e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.315366e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.827160e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.389105e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.066737e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.925619e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.971270e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.245596e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.656525e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.075080e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.440373e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.252498e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.554629e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.287534e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.036543e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.768986e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.938164e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.730833e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.832055e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.709908e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.858068e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.123102e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.787641e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.902661e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.449992e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.230532e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.080469e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.353603e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.506653e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.490494e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.123770e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.563947e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.291510e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.256074e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.107901e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.288637e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.122035e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.488430e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.881714e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.985397e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.131367e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.654556e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.143640e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.866481e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.186822e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.532599e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.372188e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.457841e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.776358e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.463456e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.948623e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.948623e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.765229e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.108484e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.884910e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.130772e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.138519e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.116206e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.830022e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.093043e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.008210e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.466416e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.710253e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.687961e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.265765e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.387560e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.536762e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.073945e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.538192e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.512013e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.002380e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.072387e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.755254e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.864547e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.081456e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.227066e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.668209e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.963183e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.051643e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.942155e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.421319e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.210303e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.264083e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.511566e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.480566e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.957918e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.209859e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.513208e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.799303e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.056133e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.590694e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.519614e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.976248e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.551234e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.758269e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.415263e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.858663e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.764071e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.470244e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.801920e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.473869e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.068716e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.232214e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.384608e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.125591e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.089514e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.007973e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.135451e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.082177e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.079544e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.566134e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.980676e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.562963e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.770950e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.561467e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.979842e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.664230e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.981990e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.768644e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.081368e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.435728e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.255028e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.733047e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.377866e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.212133e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.231710e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.081049e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.160611e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.625134e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.514601e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.291777e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.125591e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.089514e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.007973e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.135451e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.082177e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.079544e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.566134e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.980676e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.562963e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.770950e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.561467e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.979842e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.664230e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.981990e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.768644e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.081368e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.435728e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.255028e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.733047e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.377866e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.212133e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.231710e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.081049e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.160611e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.625134e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.514601e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.291777e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.661769e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.176949e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.370636e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.584925e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.185429e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.011213e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.097046e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.916499e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.989190e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.638440e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.396367e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.169710e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.280215e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.691354e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.657940e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.155708e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.724249e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.737532e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.038595e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.151552e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.326079e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.148373e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.606457e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.054116e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.125497e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.818186e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.508995e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.026426e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.326870e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.713455e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.332802e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.044204e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.571538e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.428374e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.575616e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.765636e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.122791e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.298485e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.635041e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.287122e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.335720e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.646357e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.836323e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.873906e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.356200e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.093872e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.435325e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.537199e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.625070e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.670886e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.014846e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.989374e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.970409e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.965800e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.616904e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.208478e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.134270e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.894293e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.903618e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.744853e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.509412e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.670886e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.014846e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.989374e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.970409e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.965800e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.616904e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.208478e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.134270e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.894293e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.903618e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.890350e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.537518e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.836968e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.769041e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.215008e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.024341e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.731311e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.996520e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.590676e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.314617e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.307972e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.318626e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.855995e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.295402e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.474478e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.499423e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.856240e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.903955e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.119399e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.281302e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.337425e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.019552e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.393456e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.101795e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.559644e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.003058e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.212981e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.057267e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.076737e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.116117e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.682334e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.080429e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.283352e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.328237e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.023268e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.820513e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.166151e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.722121e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.667427e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.622091e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.398081e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.213935e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.696405e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.306842e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.422531e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.105709e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.794838e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.432164e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.086940e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.116619e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.403908e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.520996e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.263449e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.199954e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.029008e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.985495e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.404380e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.197399e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.023268e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.820513e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.166151e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.722121e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.667427e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.622091e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.398081e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.213935e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.696405e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.306842e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.422531e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.105709e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.794838e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.432164e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.086940e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.116619e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.403908e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.520996e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.263449e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.199954e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.029008e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.985495e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.404380e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.197399e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.686969e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.069700e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.168306e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.118000e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.585354e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.612202e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.217626e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.220228e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.943255e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.276006e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.313614e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.709604e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.876039e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.045736e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.279956e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.744590e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.571120e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.159765e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.774740e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.978943e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.077972e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.112895e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.232885e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.067723e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.558541e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.977083e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.375485e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.714033e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.136769e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.956910e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.396296e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.164587e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.334001e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.344615e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.740284e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.109683e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.676378e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.017504e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.763998e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.534653e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.339812e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.961902e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.200353e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.829137e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.240663e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.678419e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.657301e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.620957e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.011003e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.685243e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.277399e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.736134e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.352616e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.391506e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.324089e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.482695e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.000247e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.903943e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.018327e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.282425e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.534119e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.005089e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.058044e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.675420e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.520591e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.174662e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.660818e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.674010e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.712314e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.324701e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.274403e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.271460e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.544478e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.887376e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.205812e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.547997e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.339427e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.160950e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.665022e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.244639e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.870609e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.113860e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.495489e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.020086e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.018730e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.564119e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.713543e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.266417e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.916621e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.121455e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.086224e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.564333e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.960141e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.321867e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.160302e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.237788e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.894105e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.506623e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.301663e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.962322e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.682015e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.365767e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.010667e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.073346e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.561516e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.620475e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.394900e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.331879e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.155101e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.914576e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.310225e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.899694e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.512581e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.050034e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.445227e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.891807e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.033629e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.511497e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.642640e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.431212e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.360226e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.235558e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.077506e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.016096e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.239237e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.999314e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.614439e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.243608e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.585269e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.676286e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.196804e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.821857e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.356311e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.072507e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.684275e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.136383e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.538690e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.805168e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.644829e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.448686e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.668670e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.154592e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.258493e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.873308e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.136879e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.835895e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.701362e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.403495e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.463474e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.120504e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.259004e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.727778e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.935634e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.667629e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.907090e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.534740e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.687653e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.709664e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.754978e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.782461e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.785731e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.866585e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.248051e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.258908e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.428817e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.810545e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.600445e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.688467e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.096338e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.296755e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.221856e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.123308e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.123308e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.746728e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.257477e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.879280e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.102027e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.857895e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.287420e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.010919e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.409715e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.981466e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.487718e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.227190e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.011577e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.011577e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.211285e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.713364e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.089587e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.680891e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.564583e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.313735e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.697963e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.391551e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.042692e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.240632e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.440335e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.026320e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.743412e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.417911e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.114288e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.301226e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.304264e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.735294e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.295194e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.454392e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.602674e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.423193e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.180475e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.363700e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.340563e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.253524e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.704821e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.501551e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.418206e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.865035e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.962628e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.471067e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.386414e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.248798e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.413973e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.385837e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.461830e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.956822e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.067414e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.398730e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.527371e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.902303e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.222560e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.226580e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.076062e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.430822e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.594576e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.516779e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.465181e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.543022e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.067896e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.480337e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.266532e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.804803e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.389294e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.923075e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.556098e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.653684e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.119185e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.143133e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.139192e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.539422e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.015527e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.643576e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.482895e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.375360e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.259616e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.083416e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.548857e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.156217e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.867205e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.152259e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.221029e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.119100e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.106832e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.275014e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.727009e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.965301e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.695571e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.507358e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.459150e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.862552e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.352170e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.709414e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.463715e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.154689e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.248492e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.433376e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.584017e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.472710e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.133471e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.348104e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.448430e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.813688e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.994830e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.399083e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.851754e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.244156e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.625891e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.054914e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.869330e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.992906e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.545860e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.776561e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.895833e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.364787e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.031478e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.817063e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.767463e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.318721e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.956995e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.277805e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.103966e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.741766e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.696616e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.566836e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.279980e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.831341e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.316838e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.368677e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.592498e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.867341e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.545230e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.541345e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.801585e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.240151e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.823658e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.950917e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.337381e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.876573e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.130582e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.363313e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.187669e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.758520e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.820666e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.249460e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.199785e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.586552e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.177772e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.749903e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.291851e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.751083e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.507945e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.422967e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.254322e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.585589e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.741882e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.133471e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.348104e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.448430e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.813688e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.994830e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.399083e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.851754e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.244156e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.625891e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.054914e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.869330e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.992906e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.545860e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.776561e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.895833e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.364787e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.031478e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.817063e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.767463e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.318721e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.956995e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.277805e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.103966e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.741766e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.696616e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.566836e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.279980e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.831341e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.316838e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.368677e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.592498e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.867341e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.545230e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.541345e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.801585e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.240151e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.823658e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.950917e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.337381e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.876573e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.130582e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.363313e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.187669e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.758520e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.820666e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.249460e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.199785e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.586552e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.177772e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.749903e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.291851e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.751083e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.507945e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.422967e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.254322e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.585589e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.741882e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.959574e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.419491e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.866428e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.116128e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.636708e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.238677e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.191282e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.668932e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.792388e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.444022e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.192996e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.553094e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.720629e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.136094e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.427753e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.952544e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.263351e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.620563e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.962488e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.384757e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.792758e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.280283e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.736582e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.636927e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.228111e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.130446e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.642363e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.147041e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.357131e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.618402e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.646054e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.816448e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.326126e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.371023e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.232869e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.765177e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.567487e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.503910e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.836122e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.520696e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.392873e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.094434e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.635193e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.044165e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.692370e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.594372e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.284010e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.855795e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.748716e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.012020e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.131190e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.246962e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.366890e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.243720e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.820772e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.414692e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.678407e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.708460e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.933704e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.258946e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.198831e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.283389e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.448751e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.492583e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.242292e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.665752e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.595086e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.585110e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.213555e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.148431e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.777396e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.529345e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.339741e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.091119e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.787040e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.928310e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.036884e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.098886e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.304972e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.156413e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.124945e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.058002e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.972920e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.176669e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.782669e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.602238e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.794497e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.479249e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.178524e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.872349e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.999044e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.393312e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.491890e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.080674e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.605642e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.893933e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.153637e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.774258e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.221274e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.937381e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.837568e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.442384e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.411249e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.908646e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.347912e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.665365e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.412103e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.650144e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.066590e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.020437e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.114791e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.098607e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.049552e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.688024e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.648471e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.537317e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.405481e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.456546e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.767921e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.127939e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.880546e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.830242e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.996828e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.445122e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.961035e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.488733e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.306831e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.384887e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.528091e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.554620e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.582022e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.836512e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.923678e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.086025e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.081020e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.760041e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.278792e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.097392e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.011071e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.257568e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.923678e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.086025e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.081020e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.760041e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.278792e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.097392e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.011071e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.257568e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.732183e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.627392e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.815567e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.600478e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.096278e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.588871e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.008878e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.566851e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.746283e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.580848e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.271741e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.634917e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.588610e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.192023e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.076240e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.045646e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.490438e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.497987e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.103535e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.271539e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.638199e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.681986e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.560396e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.366680e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.656329e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.823628e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.870579e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.312057e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.101285e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.354893e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.302378e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.257859e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.066599e-21. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.065076e-22. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.631103e-22. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.424842e-22. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.297341e-21. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.717953e-21. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.784105e-21. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.334614e-21. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.938355e-21. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.399631e-21. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.869721e-22. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.989474e-22. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.995976e-23. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.868390e-23. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.934917e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.383024e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.196440e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.769099e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.322621e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.158672e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.412309e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.850584e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.151473e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.879611e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.101749e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.165488e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.198365e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.009468e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.456407e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.838738e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.293666e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.462774e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.574417e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.698829e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.322621e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.158672e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.412309e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.850584e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.151473e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.879611e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.101749e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.165488e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.198365e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.009468e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.456407e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.838738e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.293666e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.462774e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.574417e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.698829e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.131625e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.175248e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.104058e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.661867e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.073176e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.994774e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.758827e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.499190e-21. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.707890e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.509923e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.226937e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.556892e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.399047e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.400046e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.998520e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.689340e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.589900e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.629496e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.950955e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.501346e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.131625e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.175248e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.104058e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.661867e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.073176e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  7.994774e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.758827e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.499190e-21. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.707890e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.509923e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.226937e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.556892e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.399047e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.400046e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.998520e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.689340e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  9.589900e-20. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.629496e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.950955e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.501346e-19. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.588368e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.186060e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.028956e-16. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.200748e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  3.007693e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.847759e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.064344e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.040681e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.792580e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.737490e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  4.772527e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.055576e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.548509e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  6.886749e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.716686e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  2.720274e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.297966e-18. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  8.258130e-17. 
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  1.614431e-16. 
+
+ans =
+
+     0
+
+
+ans =
+
+     0
+
+
+ans =
+
+     0
+
+
+ans =
+
+     0
+
+
+ans =
+
+     0
+
+
+ans =
+
+     0
+
+
+ans =
+
+     0
+
+
+ans =
+
+     0
+
+
+ans =
+
+     0
+
+
+ans =
+
+     0
+
+
+ans =
+
+     0
+
+
+ans =
+
+     0
+
+
+ans =
+
+     0
+
+
+ans =
+
+     0
+
+
+ans =
+
+     0
+
+
+ans =
+
+     0
+
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2020b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+% % "Bad" example
+% u = 1;
+% n=5;
+% q1 = @(x,y,z) x.^n + u * (x+y+z)*sqrt(1/3) + z.^n + y.^n;
+% q2 = @(x,y,z) y.^n + u * (x*sqrt(2/3) - y*sqrt(1/6) - z*sqrt(1/6)) + z.^n + x.^n;
+% q3 = @(x,y,z) z.^n + u * (y - z)*sqrt(1/2);
+% % n = n+1;
+% 
+% x0 = 0.1;
+% y0 = 0.2;
+% z0 = 0.3;
+% f1 = @(x,y,z) q1(x-x0,y-y0,z-z0);
+% f2 = @(x,y,z) q2(x-x0,y-y0,z-z0);
+% f3 = @(x,y,z) q3(x-x0,y-y0,z-z0);
+% 
+% % n = 5;
+% % f1 = @(x,y,z) (y-1/sqrt(2)).^n.*(1+z).^2 + x.^2 + y.^2 - 1;
+% % f2 = @(x,y,z) x-y + z.^5-0.5^5;
+% % f3 = @(x,y,z) z.^n - 0.5^n + x - 1/sqrt(2);
+
+% Normal example
+% n = 2;
+% q1 = @(x,y,z) ((x-0.5).^2 + (y-0.5).^2 + z.^2 - 0.5);
+% q2 = @(x,y,z) ((x+0.5).^2 + (y-0.5).^2 + z.^2 - 0.5);
+% q3 = @(x,y,z) (x.^2 + y.^2 + z.^2 - 0.5^2);
+% 
+% x0 = 0.1; %The other root is more inaccurate, and changing to +0.1 makes it even more so. Why?
+% y0 = 0.0;
+% z0 = 0.0;
+% f1 = @(x,y,z) q1(x-x0,y-y0,z-z0);
+% f2 = @(x,y,z) q2(x-x0,y-y0,z-z0);
+% f3 = @(x,y,z) q3(x-x0,y-y0,z-z0);
+% 
+% % roots - [x0, 0.25, -sqrt(3)/4; x0, 0.25, sqrt(3)/4]
+
+% Non-polynomial example
+n=6;
+f1 = @(x,y,z) cos(2*pi*x).*cos(2*pi*y).*cos(2*pi*z);
+f2 = @(x,y,z) y; %sin(2*pi*x).*sin(2*pi*y).*sin(2*pi*z);
+f3 = @(x,y,z) x.^2 + y.^2 + z.^2 - 1;
+% sqrt(15)/4, 0.25, 0.75, then sin(arccos(0.75))=sqrt(7)/4
+% vals = [sqrt(15)/4, 0.25, 0.75, sqrt(7)/4] % Each has plus and minus
+exact = [0.25 0 sqrt(15)/4; 0.25 0 -sqrt(15)/4; -0.25 0 sqrt(15)/4; -0.25 0 -sqrt(15)/4; ...
+    0.75 0 sqrt(7)/4; 0.75 0 -sqrt(7)/4; -0.75 0 sqrt(7)/4; -0.75 0 -sqrt(7)/4; ... 
+    sqrt(15)/4 0 0.25; sqrt(15)/4 0 -0.25; -sqrt(15)/4 0 0.25; -sqrt(15)/4 0 -0.25; ...
+    sqrt(7)/4 0 0.75; sqrt(7)/4 0 -0.75; -sqrt(7)/4 0 0.75; -sqrt(7)/4 0 -0.75];
+% min(abs(roots(:,3) - vals(1))) % largest error of order of magnitude 1e-07 with
+% not interpolating (n=7) as well as with interpolating.
+
+roots = find_roots(f1,f2,f3,n);
+
+% syms x y z;
+% oldroots=roots;
+% J=matlabFunction([diff(f1,x) diff(f2,x) diff(f3,x);diff(f1,y) diff(f2,y) diff(f3,y);diff(f1,z) diff(f2,z) diff(f3,z)]);
+% for ns=1:size(roots,1)
+%     g=roots(ns,:);
+%         for steps=1:10
+%             g=g-[f1(g(1),g(2),g(3)) f2(g(1),g(2),g(3)) f3(g(1),g(2),g(3))]/J(g(1),g(2),g(3));
+%         end
+%     roots(ns,:)=g;
+% end
+% roots;
+% polishment=abs(oldroots-roots)
+% 
+% treshold=1e-5;
+% sols = (abs(f1(roots(:,1),roots(:,2),roots(:,3))) < treshold) & (abs(f2(roots(:,1),roots(:,2),roots(:,3))) < treshold) & (abs(f3(roots(:,1),roots(:,2),roots(:,3))) < treshold);
+% k = find(sols);
+% roots_final = roots(k,:);
+
+for i=1:size(exact,1)
+    min(vecnorm((roots - exact(i,:))'))
+end
+
+
+##### SOURCE END #####
+--></body></html>
