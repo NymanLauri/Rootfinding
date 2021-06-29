@@ -1,5 +1,6 @@
 clear all
-addpath('C:\Matlab\MATLAB\Rootfinding\chebfun-master')
+% addpath('C:\Matlab\MATLAB\Rootfinding\chebfun-master')
+addpath('C:\Users\Lauri\Documents\MATLAB\Rootfinding\chebfun-master')
 
 f = @(x,y,z) sin(0.8*x).*cos(z.*y);
 g = @(x,y,z) y.^4;
@@ -30,7 +31,7 @@ x1 = fminbnd(@(k) fun(k,degrees,degrees(1)), 0,1)
 x2 = (degrees(end)/degrees(1))^(1/iter_range(end))
 
 plot(iter_range, degrees(1)*x1.^iter_range)
-
+legend('Actual','Fit')
 
 function grid_out = helper2(f1,f2,f3,grid_in,iter_max)
 interval = [-1 -1+2*0.5^iter_max];
