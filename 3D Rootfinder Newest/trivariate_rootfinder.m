@@ -45,7 +45,7 @@ disp('Interpolating the Cayley function:')
 tic
 A = cheby_5D_interpolate(f);
 toc
-
+% keyboard
 disp('Solving the eigenproblem:')
 tic
 % Matricization of the tensor
@@ -98,6 +98,9 @@ else
 %     D = double(D);
 %     
     roots = diag(D);
+    % Ignore the roots outside the interval [-1,1] (or the complex unit disk at
+    % this point)
+    roots = roots(abs(roots) < 1);
     
 end
 toc

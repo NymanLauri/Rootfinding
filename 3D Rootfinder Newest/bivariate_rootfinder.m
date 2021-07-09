@@ -65,5 +65,8 @@ else
 %     [~,D] = eig(vpa(C2),-vpa(C1));
 
     roots = diag(D);
+    % Ignore the roots outside the interval [-1,1] (or the complex unit disk at
+    % this point)
+    roots = roots(abs(roots) < 1);
 end
 end

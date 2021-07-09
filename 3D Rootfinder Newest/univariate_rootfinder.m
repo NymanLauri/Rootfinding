@@ -27,6 +27,8 @@ C2(end,:) = C2(end,:)+D;
 [~,D] = eig(C2,-C1);
 
 roots = diag(D);
-
+% Ignore the roots outside the interval [-1,1] (or the unit disk at
+% this point)
+roots = roots(abs(roots) < 1);
 end
 

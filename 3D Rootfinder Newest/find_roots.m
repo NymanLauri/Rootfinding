@@ -20,8 +20,8 @@ for i=1:size(z_roots)
 %         g2 = @(x) h2(x,y_roots(j));
 %         g3 = @(x) h3(x,y_roots(j));
         y_roots;
-        x_roots = univariate_rootfinder(g1,n);
-        treshold = 1e1;
+        x_roots = univariate_rootfinder(g1,n); %The case of complex roots for x is not handled
+        treshold = 1e-2;
         sols = (abs(f1(x_roots,y_roots(j),z_roots(i))) < treshold) & (abs(f2(x_roots,y_roots(j),z_roots(i))) < treshold) & (abs(f3(x_roots,y_roots(j),z_roots(i))) < treshold);
         k = find(sols);
         if (size(k,1) ~= 0)
@@ -39,7 +39,7 @@ oldroots=roots;
 J=matlabFunction([diff(f1,x) diff(f2,x) diff(f3,x);diff(f1,y) diff(f2,y) diff(f3,y);diff(f1,z) diff(f2,z) diff(f3,z)]);
 for ns=1:size(roots,1)
     g=roots(ns,:);
-        for steps=1:100
+        for steps=1:0
             g=g-[f1(g(1),g(2),g(3)) f2(g(1),g(2),g(3)) f3(g(1),g(2),g(3))]/J(g(1),g(2),g(3));
             if (abs(f1(g(1),g(2),g(3))) < treshold) & (abs(f2(g(1),g(2),g(3))) < treshold) & (abs(f3(g(1),g(2),g(3))) < treshold)
                 break;
