@@ -15,7 +15,7 @@ n = max([f1_1, f2_1, f3_1])-1;
 %root
 small_val = 1e-6; 
 
-% Max amount of subdivisions is 8 for now
+% Max amount of subdivisions is 10 for now
 if n > 5 && iteration <= 10
     input_first.nodes = [grid_in.nodes(1) 1/2*(grid_in.nodes(1)+grid_in.nodes(2))+small_val];
     grid_first = subdivide(f1,f2,f3,input_first,iteration + 1);
