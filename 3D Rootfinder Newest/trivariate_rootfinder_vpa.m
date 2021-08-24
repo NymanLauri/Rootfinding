@@ -1,11 +1,17 @@
 % Takes in three trivariate functions whose zeros we want to find.
-% Solves the third component of the roots.
+% Solves the third component of the roots in vpa (requires tweaking the 
+% code - never got this to work properly, see exact_resultant.m).
 % n is the maximal degree of the polynomials.
 function roots = trivariate_rootfinder(f1,f2,f3,n)
 % Perturbation
 f1 = @(x,y,z) f1(x,y,z) + eps*x.^n + eps*y.^n + eps*z.^n;
 f2 = @(x,y,z) f2(x,y,z) + eps*x.^n + eps*y.^n + eps*z.^n;
 f3 = @(x,y,z) f3(x,y,z) + eps*x.^n + eps*y.^n + eps*z.^n;
+
+% addpath('C:\Matlab\MATLAB\Rootfinding\chebfun-master')
+% f1 = chebfun3(@(x,y,z) f1(x,y,z), [n+1, n+1, n+1]);
+% f2 = chebfun3(@(x,y,z) f2(x,y,z), [n+1, n+1, n+1]);
+% f3 = chebfun3(@(x,y,z) f3(x,y,z), [n+1, n+1, n+1]);
 
 disp('Evaluating the Cayley function:')
 tic
@@ -46,6 +52,8 @@ tic
 % Matricization of the tensor
 R = reshape(A, n_s1*n_s2, n_s1*n_s2, n_z);
 
+%0.5*(s1+t1+u)*(2 s2 z^2 + 2 t2 z^2 - 2 u z^2 + sqrt(2) u z^2 + sqrt(2) s2 t2 u - sqrt(2) s2 u z - sqrt(2) t2 u z)
+
 % If all the coefficients of the highest degree are zero, leave it out from the linearization 
 z_length = n_z;
 for i = flip(1:n_z)
@@ -80,7 +88,13 @@ else
     % Solve the eigenproblem
     [~,D] = eig(C2,-C1);
 %     [~, D, C]=polyeig(C2,-C1);
-   
+
+%     C2=vpa(C2,16);
+%     C1=vpa(C1,16);
+% 
+%     [~,D] = eig(-C2/C1);
+%     D = double(D);
+%     
     roots = diag(D);
     % Ignore the roots outside the interval [-1,1] (or the complex unit disk at
     % this point)
@@ -90,4 +104,24 @@ end
 toc
 
 
+% tic
+% cheby_vectors = flip(cheby_basis(z_length),1);
+% temp=roots;
+% roots=[];
+% for j=1:size(temp)
+%     z = temp(j);
+%     z_vals = [1];
+%     for i=2:z_length
+%         z_vals = [z_vals z^(i-1)];
+%     end
+% 
+%     M = R(:,:,1);
+%     for i=2:z_length
+%         M = M + R(:,:,i)*(z_vals*cheby_vectors(:,i));
+%     end
+%     
+%     det(M)
+%     if (det(M) < 1e-6); roots = [roots; z]; end
+% end
+% toc
 end

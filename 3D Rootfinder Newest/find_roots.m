@@ -11,14 +11,11 @@ for i=1:size(z_roots)
     if (isinf(z_roots(i)) || ~isreal(z_roots(i)) ); continue; end
     h1 = @(x,y) f1(x,y,z_roots(i));
     h2 = @(x,y) f2(x,y,z_roots(i));
-%     h3 = @(x,y) f3(x,y,z_roots(i));
     y_roots = bivariate_rootfinder(h1,h2,n);
 
     for j=1:size(y_roots)
         if (isinf(y_roots(j)) || ~isreal(y_roots(j))); continue; end
         g1 = @(x) h1(x,y_roots(j));
-%         g2 = @(x) h2(x,y_roots(j));
-%         g3 = @(x) h3(x,y_roots(j));
         y_roots;
         x_roots = univariate_rootfinder(g1,n); %The case of complex roots for x is not handled
         treshold = 1e-2;
@@ -33,9 +30,9 @@ end
 roots;
 toc
 
+%Newton's iteration
 treshold=1e-12;
 syms x y z;
-oldroots=roots;
 J=matlabFunction([diff(f1,x) diff(f2,x) diff(f3,x);diff(f1,y) diff(f2,y) diff(f3,y);diff(f1,z) diff(f2,z) diff(f3,z)]);
 for ns=1:size(roots,1)
     g=roots(ns,:);
@@ -48,12 +45,11 @@ for ns=1:size(roots,1)
     roots(ns,:)=g;
 end
 
-% roots;
-% polishment=abs(oldroots-roots)
-
+% Leave out spurious solutions (uncomment)
 % treshold=1e-5;
 % sols = (abs(f1(roots(:,1),roots(:,2),roots(:,3))) < treshold) & (abs(f2(roots(:,1),roots(:,2),roots(:,3))) < treshold) & (abs(f3(roots(:,1),roots(:,2),roots(:,3))) < treshold);
 % k = find(sols);
 % roots_final = roots(k,:);
+% roots = roots_final;
 
 end

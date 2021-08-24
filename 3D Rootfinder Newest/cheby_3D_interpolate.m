@@ -1,4 +1,4 @@
-% 5-variate polynomial interpolation in chebyshev basis. Takes in the
+% 3-variate polynomial interpolation in chebyshev basis. Takes in the
 % values of a function at Chebyshev points and the degree of the desired interpolation polynomial
 function result = cheby_3D_interpolate(f)
 [n1,n2,n3] = size(f);

@@ -61,9 +61,6 @@ else
     % Solve the eigenproblem
     [~,D] = eig(C2,-C1);
     
-%     % Solve the eigenproblem
-%     [~,D] = eig(vpa(C2),-vpa(C1));
-
     roots = diag(D);
     % Ignore the roots outside the interval [-1,1] (or the complex unit disk at
     % this point)
