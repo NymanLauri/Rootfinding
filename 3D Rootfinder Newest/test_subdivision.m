@@ -1,6 +1,5 @@
 clear all
-addpath('C:\Matlab\MATLAB\Rootfinding\chebfun-master')
-% addpath('C:\Users\Lauri\Documents\MATLAB\Rootfinding\chebfun-master')
+addpath('..\chebfun-master')
 
 f = @(x,y,z) sin(2*pi*2.1*x).*cos(z.*y);
 g = @(x,y,z) cos(2*pi*y);

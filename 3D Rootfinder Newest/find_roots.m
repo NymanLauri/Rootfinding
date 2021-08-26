@@ -3,6 +3,7 @@ function roots = find_roots(f1,f2,f3,n)
 z_roots = trivariate_rootfinder(f1,f2,f3,n);
 roots = [];
 
+disp('Finding all first and second components:')
 tic
 
 % TODO: Choose in which order you solve z, y and x based on the degrees to
@@ -27,7 +28,6 @@ for i=1:size(z_roots)
     end
 end
 
-roots;
 toc
 
 %Newton's iteration

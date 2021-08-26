@@ -8,7 +8,7 @@ f1 = @(x,y,z) f1(x,y,z) + eps*x.^n + eps*y.^n + eps*z.^n;
 f2 = @(x,y,z) f2(x,y,z) + eps*x.^n + eps*y.^n + eps*z.^n;
 f3 = @(x,y,z) f3(x,y,z) + eps*x.^n + eps*y.^n + eps*z.^n;
 
-% addpath('C:\Matlab\MATLAB\Rootfinding\chebfun-master')
+% addpath('..\chebfun-master')
 % f1 = chebfun3(@(x,y,z) f1(x,y,z), [n+1, n+1, n+1]);
 % f2 = chebfun3(@(x,y,z) f2(x,y,z), [n+1, n+1, n+1]);
 % f3 = chebfun3(@(x,y,z) f3(x,y,z), [n+1, n+1, n+1]);
